@@ -134,3 +134,4 @@ if __name__ == "__main__":
     video_ids = get_video_ids(playlistId)
     video_data = extract_video_data(video_ids)
     save_to_json(video_data)
+    print("Data extraction and saving completed successfully.")
