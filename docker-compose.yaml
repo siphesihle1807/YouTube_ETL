@@ -92,6 +92,7 @@ x-airflow-common:
     POSTGRES_CONN_HOST: ${POSTGRES_CONN_HOST}
     POSTGRES_CONN_PORT: ${POSTGRES_CONN_PORT}
   volumes:
+  # used for data persistence, and for making DAGs, plugins, and other files available to the containers
     - ./config:/opt/airflow/config
     - ./dags:/opt/airflow/dags
     - ./data:/opt/airflow/data
