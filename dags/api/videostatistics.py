@@ -1,19 +1,21 @@
-import json
 import requests
+import json
 from datetime import date
 
-import os
-from dotenv import load_dotenv
+# import os
+# from dotenv import load_dotenv
+# load_dotenv(dotenv_path="./.env")
 
-load_dotenv(dotenv_path="./.env")
-API_KEY = os.getenv("API_KEY")
+from airflow.decorators import task
+from airflow.models import Variable
 
 
-CHANNEL_HANDLE = os.getenv("CHANNEL_HANDLE")
+API_KEY = Variable.get("API_KEY")
+CHANNEL_HANDLE = Variable.get("CHANNEL_HANDLE")
 maxResults = 50
 
 
-
+@task
 def get_playlist_id():
 
     try:
@@ -38,7 +40,9 @@ def get_playlist_id():
 
     except requests.exceptions.RequestException as e:
         raise e
-    
+
+
+@task
 def get_video_ids(playlistId):
 
     video_ids = []
@@ -72,11 +76,13 @@ def get_video_ids(playlistId):
                 break
 
         return video_ids
+    
 
     except requests.exceptions.RequestException as e:
         raise e
 
 
+@task
 def extract_video_data(video_ids):
 
     extracted_data = []
@@ -119,11 +125,11 @@ def extract_video_data(video_ids):
 
     except requests.exceptions.RequestException as e:
         raise e
-    
+
+
+@task
 def save_to_json(extracted_data):
     file_path = f"./data/YT_data_{date.today()}.json"
-    output_dir = os.path.dirname(file_path)
-    os.makedirs(output_dir, exist_ok=True)
 
     with open(file_path, "w", encoding="utf-8") as json_outfile:
         json.dump(extracted_data, json_outfile, indent=4, ensure_ascii=False)
@@ -134,4 +140,3 @@ if __name__ == "__main__":
     video_ids = get_video_ids(playlistId)
     video_data = extract_video_data(video_ids)
     save_to_json(video_data)
-    print("Data extraction and saving completed successfully.")
